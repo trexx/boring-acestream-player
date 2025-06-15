@@ -30,7 +30,7 @@ RUN chmod +x /catatonit
 
 # Compile scratch image
 FROM scratch AS compile
-LABEL org.opencontainers.image.source="https://github.com/trexx/docker-homer"
+LABEL org.opencontainers.image.source="https://github.com/trexx/docker-ace-player"
 
 COPY --from=build-busybox /etc/passwd /etc/passwd
 COPY --from=build-busybox /busybox/_install/bin/busybox /
