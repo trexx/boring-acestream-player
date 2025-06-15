@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AceStream Player</title>
+  <script src="mpegts.js"></script>
+</head>
+
+<body>
+  <label for="acestreamId">AceStream ID</label>
+  <input type="text" id="acestreamId">
+  <button id="copyButton" disabled>Copy Stream URL</button>
+  <br><br>
+
+  <video id="videoElement" controls></video>
+
+  <script>
+    const acestreamInput = document.getElementById('acestreamId');
+    const copyButton = document.getElementById('copyButton');
+    let streamUrl = '';
+
+    // Load saved AceStream ID and generate URL
+    acestreamInput.value = localStorage.getItem('acestreamId') || '';
+    generateStreamUrl();
+
+    acestreamInput.addEventListener('input', generateStreamUrl);
+
+    function generateStreamUrl() {
+      const acestreamId = acestreamInput.value.trim();
+      const hostname = window.location.hostname;
+
+      if (acestreamId) {
+        localStorage.setItem('acestreamId', acestreamId);
+        streamUrl = `http://${hostname}/ace/getstream?id=${acestreamId}`;
+        copyButton.disabled = false;
+      } else {
+        streamUrl = '';
+        copyButton.disabled = true;
+      }
+    }
+
+    acestreamId.addEventListener('keypress', function(event) {
+      if (event.key === 'Enter') {
+        startStream();
+      }
+    });
+
+    copyButton.addEventListener('click', function() {
+      if (streamUrl) {
+        navigator.clipboard.writeText(streamUrl)
+        };
+    });
+
+    function startStream() {
+      if (streamUrl && mpegts.getFeatureList().mseLivePlayback) {
+        let player = mpegts.createPlayer(
+          {
+            type: 'mse',
+            url: streamUrl
+          },
+          {
+            enableWorker: true,
+            enableStashBuffer: false,
+            hasAudio: true,
+            hasVideo: true,
+            isLive: true,
+            lazyLoad: false
+          }
+        );
+        
+        player.attachMediaElement(document.getElementById('videoElement'));
+        player.load();
+        player.play();
+      }
+    }
+  </script>
+</body>
+
+</html
