@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Boring AceStream Player</title>
+  <script src="mpegts.js"></script>
+  <link rel="icon" href="data:,">
+</head>
+
+<body>
+  <label for="acestreamId">AceStream ID</label>
+  <input type="text" id="acestreamId">
+  <br><br>
+
+  <video id="videoElement" controls width="800"></video>
+
+  <script>
+    const acestreamInput = document.getElementById('acestreamId');
+    const videoElement = document.getElementById('videoElement');
+    
+    let streamUrl = '';
+    let player = null;
+
+    acestreamInput.value = localStorage.getItem('acestreamId') || '';
+
+    acestreamInput.addEventListener('keypress', function(event) {
+      event.preventDefault();
+
+      if (event.key === 'Enter' && acestreamId) {
+        const acestreamId = acestreamInput.value.trim();
+        const hostname = window.location.hostname;
+
+        localStorage.setItem('acestreamId', acestreamId);
+        streamUrl = `http://${hostname}/ace/getstream?id=${acestreamId}`;
+        
+        if (player) {
+          player.destroy();
+          player = null;
+        }
+
+        if (streamUrl && mpegts.getFeatureList().mseLivePlayback) {
+          player = mpegts.createPlayer({
+            type: 'mse',
+            isLive: true,
+            url: streamUrl
+          }, {
+            enableWorker: true,
+            enableStashBuffer: false,
+            isLive: true
+          });
+          
+          player.attachMediaElement(videoElement);    
+          player.load();
+          player.play();
+        }
+      }
+    });
+
+  </script>
+</body>
+
+</html>
